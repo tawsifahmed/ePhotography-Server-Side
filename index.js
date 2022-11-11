@@ -34,9 +34,28 @@ async function run() {
         });
 
         // reviewers api
+        app.get('/reviewers', async (req, res) => {
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+
+            const cursor = reviewerCollection.find(query);
+            const reviewers = await cursor.toArray();
+            res.send(reviewers);
+        });
         app.post('/reviewers', async (req, res) => {
             const reviewer = req.body;
             const result = await reviewerCollection.insertOne(reviewer);
+            res.send(result);
+        });
+
+        app.delete('/reviewers/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await reviewerCollection.deleteOne(query);
             res.send(result);
         })
     }
