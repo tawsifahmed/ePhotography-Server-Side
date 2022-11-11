@@ -2,25 +2,51 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 1000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 
+// middle wares
+app.use(cors());
+app.use(express.json());
 
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@tawsifahmed.18d0gsh.mongodb.net/?retryWrites=true&w=majority`;
 console.log(uri)
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-client.connect(err => {
-    const collection = client.db("test").collection("devices");
-    // perform actions on the collection object
-    client.close();
-});
 
+async function run() {
+    try {
+        const serviceCollection = client.db('a11-server').collection('services');
+        const reviewerCollection = client.db('a11-server').collection('reviewers')
+        app.get('/services', async (req, res) => {
+            const query = {}
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services);
+        });
 
-// middle wares
-app.use(cors());
-app.use(express.json());
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const service = await serviceCollection.findOne(query);
+            res.send(service);
+        });
+
+        // reviewers api
+        app.post('/reviewers', async (req, res) => {
+            const reviewer = req.body;
+            const result = await reviewerCollection.insertOne(reviewer);
+            res.send(result);
+        })
+    }
+    finally {
+
+    }
+}
+
+run().catch(err => console.error(err));
+
 
 app.get('/', (req, res) => {
     res.send('a11 server running')
