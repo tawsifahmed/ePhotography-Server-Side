@@ -25,7 +25,7 @@ async function run() {
             const query = {}
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
-            res.send(services.reverse().slice(-3));
+            res.send(services.slice(-3).reverse());
         });
 
         app.get('/servicesall', async (req, res) => {
@@ -40,6 +40,12 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const service = await serviceCollection.findOne(query);
             res.send(service);
+        });
+
+        app.post('/services', async (req, res) => {
+            const addedService = req.body;
+            const result = await serviceCollection.insertOne(addedService);
+            res.send(result);
         });
 
         // reviewers api
