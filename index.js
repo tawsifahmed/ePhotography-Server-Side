@@ -19,11 +19,20 @@ async function run() {
     try {
         const serviceCollection = client.db('a11-server').collection('services');
         const reviewerCollection = client.db('a11-server').collection('reviewers')
+
+        // services api 
         app.get('/services', async (req, res) => {
             const query = {}
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
-            res.send(services);
+            res.send(services.reverse().slice(-3));
+        });
+
+        app.get('/servicesall', async (req, res) => {
+            const query = {}
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services.reverse());
         });
 
         app.get('/services/:id', async (req, res) => {
@@ -41,11 +50,19 @@ async function run() {
                     email: req.query.email
                 }
             }
+            else if
+                (req.query.service) {
+                query = {
+                    service: req.query.service
+                }
+            }
 
             const cursor = reviewerCollection.find(query);
             const reviewers = await cursor.toArray();
             res.send(reviewers);
         });
+
+
 
         app.post('/reviewers', async (req, res) => {
             const reviewer = req.body;
