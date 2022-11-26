@@ -20,7 +20,8 @@ async function run() {
         const serviceCollection = client.db('a11-server').collection('services');
         const reviewerCollection = client.db('a11-server').collection('reviewers')
 
-        // services api 
+
+        // services api for home page (showing 3 services)
         app.get('/services', async (req, res) => {
             const query = {}
             const cursor = serviceCollection.find(query);
@@ -28,6 +29,7 @@ async function run() {
             res.send(services.slice(-3).reverse());
         });
 
+        // services api for showing all services
         app.get('/servicesall', async (req, res) => {
             const query = {}
             const cursor = serviceCollection.find(query);
@@ -35,6 +37,7 @@ async function run() {
             res.send(services.reverse());
         });
 
+        // specific service detail card api
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -42,6 +45,7 @@ async function run() {
             res.send(service);
         });
 
+        // add service api post method
         app.post('/services', async (req, res) => {
             const addedService = req.body;
             const result = await serviceCollection.insertOne(addedService);
@@ -65,17 +69,18 @@ async function run() {
 
             const cursor = reviewerCollection.find(query);
             const reviewers = await cursor.toArray();
-            res.send(reviewers);
+            res.send(reviewers.reverse());
         });
 
 
-
+        // reviewers post 
         app.post('/reviewers', async (req, res) => {
             const reviewer = req.body;
             const result = await reviewerCollection.insertOne(reviewer);
             res.send(result);
         });
 
+        // reviewers dlt
         app.delete('/reviewers/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
